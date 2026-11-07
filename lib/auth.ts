@@ -15,8 +15,9 @@ export const auth = betterAuth({
   user: {
     additionalFields: {
       role: {
-        type: ["seeker", "recruter", "admin"],
-        input: false,
+        type: ["seeker", "recruiter", "admin"],
+        defaultValue: "seeker",
+        input: true, // allow the sign-up request body to set the role
       },
     },
   },

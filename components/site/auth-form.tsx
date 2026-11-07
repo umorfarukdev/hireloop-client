@@ -2,9 +2,16 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { EyeIcon, EyeOffIcon } from "lucide-react"
+import {
+  BriefcaseBusinessIcon,
+  EyeIcon,
+  EyeOffIcon,
+  ShieldCheckIcon,
+  UserRoundIcon,
+  type LucideIcon,
+} from "lucide-react"
 
-import { AuthFormData } from "@/type/type"
+import { AuthFormData, UserRole } from "@/type/type"
 import { Logo } from "@/components/site/logo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,6 +19,12 @@ import { Label } from "@/components/ui/label"
 import { cn } from "cn"
 
 type Mode = "signin" | "signup"
+
+const ROLES: Array<{ value: UserRole; label: string; icon: LucideIcon }> = [
+  { value: "seeker", label: "Seeker", icon: UserRoundIcon },
+  { value: "recruiter", label: "Recruiter", icon: BriefcaseBusinessIcon },
+  { value: "admin", label: "Admin", icon: ShieldCheckIcon },
+]
 
 // Optional hook for real auth logic (e.g. better-auth). Receives the
 // collected form values. Return better-auth's `{ error }` shape or
@@ -63,6 +76,7 @@ export function AuthForm({
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [role, setRole] = useState<UserRole>("seeker")
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -127,6 +141,42 @@ export function AuthForm({
                 placeholder="Your name"
                 className="h-10 rounded-xl sm:h-10"
               />
+            </div>
+          )}
+
+          {/* Role picker (sign-up only) */}
+          {mode === "signup" && (
+            <div
+              role="radiogroup"
+              aria-label="Account role"
+              className="grid grid-cols-3 gap-1 rounded-xl bg-muted p-1"
+            >
+              {ROLES.map((option) => {
+                const Icon = option.icon
+                const selected = role === option.value
+                return (
+                  <label
+                    key={option.value}
+                    className={cn(
+                      "flex cursor-pointer items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-medium transition-colors outline-none",
+                      selected
+                        ? "bg-card text-foreground shadow-sm ring-1 ring-ring/20"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="role"
+                      value={option.value}
+                      checked={selected}
+                      onChange={() => setRole(option.value)}
+                      className="sr-only"
+                    />
+                    <Icon className="size-3.5" aria-hidden="true" />
+                    {option.label}
+                  </label>
+                )
+              })}
             </div>
           )}
 
