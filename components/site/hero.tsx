@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { CalendarClockIcon, MapPinIcon, SearchIcon, SparklesIcon } from "lucide-react"
+import { MapPinIcon, SearchIcon, SparklesIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -98,17 +98,6 @@ export function Hero() {
               Search
             </Button>
           </div>
-
-          <Button
-            variant="outline"
-            size="lg"
-            nativeButton={false}
-            render={<Link href="/book-a-call" />}
-            className="h-14 shrink-0 rounded-full font-semibold"
-          >
-            <CalendarClockIcon aria-hidden="true" />
-            Book a Call
-          </Button>
         </form>
 
         {/* Trending positions */}

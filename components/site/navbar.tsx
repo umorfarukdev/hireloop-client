@@ -76,7 +76,7 @@ export function SiteNavbar() {
             variant="ghost"
             nativeButton={false}
             className="hidden rounded-full font-semibold text-muted-foreground hover:text-foreground sm:inline-flex"
-            render={<Link href="/signin" />}
+            render={<Link href="/sign-in" />}
           >
             Sign In
           </Button>
@@ -90,7 +90,7 @@ export function SiteNavbar() {
           <Button
             nativeButton={false}
             className="hidden rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-md shadow-violet-500/25 hover:from-indigo-400 hover:to-violet-400 sm:inline-flex"
-            render={<Link href="/get-started" />}
+            render={<Link href="/sign-up" />}
           >
             Get Started
           </Button>
@@ -145,14 +145,14 @@ export function SiteNavbar() {
                   variant="outline"
                   nativeButton={false}
                   className="w-full rounded-full"
-                  render={<Link href="/signin" />}
+                  render={<Link href="/sign-in" />}
                 >
                   Sign In
                 </Button>
                 <Button
                   nativeButton={false}
                   className="w-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-md shadow-violet-500/25 hover:from-indigo-400 hover:to-violet-400"
-                  render={<Link href="/get-started" />}
+                  render={<Link href="/sign-up" />}
                 >
                   Get Started
                 </Button>
