@@ -11,7 +11,7 @@ const SignInPage = () => {
       const { data: signInResponse, error } = await signIn.email({
         email: data.email,
         password: data.password,
-        // callbackURL: "/",
+        callbackURL: "/",
       })
       console.log("signInResponse", signInResponse, "error", error)
     }

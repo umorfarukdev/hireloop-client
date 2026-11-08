@@ -2,7 +2,12 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { BriefcaseBusinessIcon, Building2Icon, MenuIcon, TagsIcon } from "lucide-react"
+import {
+  BriefcaseBusinessIcon,
+  Building2Icon,
+  MenuIcon,
+  TagsIcon,
+} from "lucide-react"
 
 import { Logo } from "@/components/site/logo"
 import { Button } from "@/components/ui/button"
@@ -23,6 +28,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { cn } from "cn"
+import { signOut, useSession } from "@/lib/auth-client"
 
 const NAV_LINKS = [
   { href: "/jobs", label: "Browse Jobs", icon: BriefcaseBusinessIcon },
@@ -32,12 +38,21 @@ const NAV_LINKS = [
 
 export function SiteNavbar() {
   const pathname = usePathname()
+  const { data: session } = useSession()
+
+  const handleSignOut = async () => {
+    await signOut()
+  }
+
+  const displayName = session?.user
+    ? session.user.name || session.user.email
+    : null
 
   return (
     <header className="sticky inset-x-0 top-0 z-50 flex justify-center px-4 pt-3 sm:pt-4">
       <nav
         data-slot="site-navbar"
-        className="flex h-14 w-full max-w-6xl items-center justify-between gap-2 rounded-full border border-border bg-background/70 pl-4 pr-3 shadow-lg shadow-black/5 backdrop-blur-md"
+        className="flex h-14 w-full max-w-6xl items-center justify-between gap-2 rounded-full border border-border bg-background/70 pr-3 pl-4 shadow-lg shadow-black/5 backdrop-blur-md"
       >
         {/* Logo */}
         <Logo />
@@ -53,7 +68,7 @@ export function SiteNavbar() {
               return (
                 <NavigationMenuItem key={link.href}>
                   <NavigationMenuLink
-                    render={<Link href={link.href} />} 
+                    render={<Link href={link.href} />}
                     className={cn(
                       navigationMenuTriggerStyle(),
                       "rounded-full bg-transparent hover:bg-muted dark:hover:bg-muted/50",
@@ -71,29 +86,38 @@ export function SiteNavbar() {
         </NavigationMenu>
 
         {/* Actions */}
-        <div className="flex items-center gap-1.5">
-          <Button
-            variant="ghost"
-            nativeButton={false}
-            className="hidden rounded-full font-semibold text-muted-foreground hover:text-foreground sm:inline-flex"
-            render={<Link href="/sign-in" />}
-          >
-            Sign In
-          </Button>
-
-          {/* Divider (Line 2 in the design) */}
-          <div
-            aria-hidden="true"
-            className="hidden h-5 w-px bg-border sm:block"
-          />
-
-          <Button
-            nativeButton={false}
-            className="hidden rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-md shadow-violet-500/25 hover:from-indigo-400 hover:to-violet-400 sm:inline-flex"
-            render={<Link href="/sign-up" />}
-          >
-            Get Started
-          </Button>
+        <div className="flex min-w-0 items-center gap-1.5">
+          {displayName ? (
+            <>
+              <span
+                title={displayName}
+                className="hidden max-w-32 truncate text-sm text-muted-foreground sm:inline-block"
+              >
+                {displayName}
+              </span>
+              <Button variant="outline" className="rounded-full" onClick={handleSignOut}>
+                Sign Out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                nativeButton={false}
+                className="rounded-full"
+                render={<Link href="/sign-in" />}
+              >
+                Sign In
+              </Button>
+              <Button
+                nativeButton={false}
+                className="rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-md shadow-violet-500/25 hover:from-indigo-400 hover:to-violet-400"
+                render={<Link href="/sign-up" />}
+              >
+                Get Started
+              </Button>
+            </>
+          )}
 
           {/* Mobile menu trigger */}
           <Sheet>
@@ -141,21 +165,38 @@ export function SiteNavbar() {
               </div>
 
               <SheetFooter className="gap-2">
-                <Button
-                  variant="outline"
-                  nativeButton={false}
-                  className="w-full rounded-full"
-                  render={<Link href="/sign-in" />}
-                >
-                  Sign In
-                </Button>
-                <Button
-                  nativeButton={false}
-                  className="w-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-md shadow-violet-500/25 hover:from-indigo-400 hover:to-violet-400"
-                  render={<Link href="/sign-up" />}
-                >
-                  Get Started
-                </Button>
+                {displayName ? (
+                  <>
+                    <p className="truncate text-center text-sm text-muted-foreground">
+                      Welcome, {displayName}
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="w-full rounded-full"
+                      onClick={handleSignOut}
+                    >
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant="outline"
+                      nativeButton={false}
+                      className="w-full rounded-full"
+                      render={<Link href="/sign-in" />}
+                    >
+                      Sign In
+                    </Button>
+                    <Button
+                      nativeButton={false}
+                      className="w-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-md shadow-violet-500/25 hover:from-indigo-400 hover:to-violet-400"
+                      render={<Link href="/sign-up" />}
+                    >
+                      Get Started
+                    </Button>
+                  </>
+                )}
               </SheetFooter>
             </SheetContent>
           </Sheet>

@@ -214,8 +214,10 @@ export function AuthForm({
                 autoComplete={
                   mode === "signup" ? "new-password" : "current-password"
                 }
-                minLength={8}
-                placeholder="At least 8 characters"
+                minLength={mode === "signup" ? 8 : undefined}
+                placeholder={
+                  mode === "signup" ? "At least 8 characters" : "Enter your password"
+                }
                 className="h-10 rounded-xl pr-10 sm:h-10"
               />
               <button
