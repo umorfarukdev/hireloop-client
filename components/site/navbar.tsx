@@ -30,15 +30,17 @@ import {
 import { cn } from "cn"
 import { signOut, useSession } from "@/lib/auth-client"
 
-const NAV_LINKS = [
-  { href: "/jobs", label: "Browse Jobs", icon: BriefcaseBusinessIcon },
-  { href: "/company", label: "Company", icon: Building2Icon },
-  { href: "/pricing", label: "Pricing", icon: TagsIcon },
-]
 
 export function SiteNavbar() {
   const pathname = usePathname()
   const { data: session } = useSession()
+
+  const NAV_LINKS = [
+  { href: "/jobs", label: "Browse Jobs", icon: BriefcaseBusinessIcon },
+  { href: "/company", label: "Company", icon: Building2Icon },
+  { href: "/pricing", label: "Pricing", icon: TagsIcon },
+  { href: `/dashboard/${session?.user?.role || "seeker"}`, label: "Dashboard", icon: Building2Icon},
+]
 
   const handleSignOut = async () => {
     await signOut()
