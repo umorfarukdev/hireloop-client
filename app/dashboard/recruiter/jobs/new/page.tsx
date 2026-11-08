@@ -2,9 +2,8 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useForm, Controller } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+import { useForm } from "react-hook-form"
+
 import {
   ChevronRightIcon,
   Clock3Icon,
@@ -42,6 +41,8 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useSession } from "@/lib/auth-client"
+import { createJob } from "@/lib/actions/jobs"
+import { JobFormValues } from "@/type/type"
 
 /* ------------------------------------------------------------------ */
 /* Options (from the Figma "Add New Job" spec)                        */
@@ -81,41 +82,6 @@ const labelOf = (
 /* Schema — one zod object = all form entries collected on submit      */
 /* ------------------------------------------------------------------ */
 
-const jobSchema = z
-  .object({
-    jobTitle: z.string().min(3, "Job title must be at least 3 characters"),
-    companyName: z.string().min(2, "Company name is required"),
-    jobCategory: z.string().min(1, "Select a job category"),
-    jobType: z.string().min(1, "Select a job type"),
-    isRemote: z.boolean(),
-    location: z.string().min(2, "Job location is required"),
-    deadline: z.string().optional(),
-    minSalary: z.string().optional(),
-    maxSalary: z.string().optional(),
-    salaryFrequency: z.string(),
-    responsibilities: z.string().min(10, "Describe the key responsibilities"),
-    qualifications: z
-      .string()
-      .min(10, "List the qualifications & requirements"),
-  })
-  .refine(
-    (values) => {
-      const min = values.minSalary ? Number(values.minSalary) : undefined
-      const max = values.maxSalary ? Number(values.maxSalary) : undefined
-      if (min === undefined && max === undefined) return true
-      if (min !== undefined && Number.isNaN(min)) return false
-      if (max !== undefined && Number.isNaN(max)) return false
-      if (min !== undefined && max !== undefined && max < min) return false
-      return true
-    },
-    {
-      message: "Enter a valid salary range (max must be ≥ min)",
-      path: ["maxSalary"],
-    }
-  )
-
-type JobFormValues = z.infer<typeof jobSchema>
-
 const DEFAULT_VALUES: JobFormValues = {
   jobTitle: "",
   companyName: "",
@@ -138,10 +104,9 @@ const DEFAULT_VALUES: JobFormValues = {
 const NewJobAddPage = () => {
   const [submitted, setSubmitted] = useState(false)
 
-  const {data: session} = useSession()
+  const { data: session } = useSession()
 
   const form = useForm<JobFormValues>({
-    resolver: zodResolver(jobSchema),
     defaultValues: DEFAULT_VALUES,
   })
 
@@ -160,21 +125,8 @@ const NewJobAddPage = () => {
     console.log("new job form data", payload)
     setSubmitted(true)
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    })
-
-    if (!res.ok) {
-      console.error("Failed to submit job:", res.statusText)
-      return
-    }
-
-    const result = await res.json()
-    console.log("Job submitted successfully:", result)
+    const result = await createJob(payload)
+    console.log("created job",result)
   }
 
   const salaryText =
