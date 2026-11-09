@@ -1,14 +1,8 @@
-"use client"
-
-import { useState } from "react"
 import Link from "next/link"
 import {
   ChevronRightIcon,
-  EyeIcon,
   MapPinIcon,
-  PencilIcon,
   PlusIcon,
-  Trash2Icon,
   UsersIcon,
 } from "lucide-react"
 
@@ -23,22 +17,16 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  DUMMY_JOBS,
-  formatDate,
-  formatLocation,
-  formatSalary,
-  departmentOf,
-  labelOf,
-  JOB_TYPES,
-  type JobPost,
-} from "@/lib/jobs"
+import { getJobs } from "@/lib/api/jobs"
+import { departmentOf, formatDate, formatLocation, formatSalary, JOB_TYPES, JobPost, labelOf } from "@/lib/jobs"
+import JobsRowActions from "@/app/components/JobsRowActions"
+import { JobFormValues } from "@/type/type"
 
 /* ------------------------------------------------------------------ */
 /* Status badge — Active (green) / Expired (red)                       */
 /* ------------------------------------------------------------------ */
 
-const StatusBadge = ({ status }: { status: JobPost["status"] }) => (
+export const StatusBadge = ({ status }: { status: JobPost["status"] }) => (
   <Badge
     variant="outline"
     className={
@@ -51,59 +39,10 @@ const StatusBadge = ({ status }: { status: JobPost["status"] }) => (
   </Badge>
 )
 
-/* ------------------------------------------------------------------ */
-/* Row actions — Update (link) / View / Delete                         */
-/* ------------------------------------------------------------------ */
 
-const RowActions = ({
-  job,
-  onDelete,
-}: {
-  job: JobPost
-  onDelete: (id: string) => void
-}) => (
-  <div className="flex items-center justify-end gap-1.5">
-    <Button
-      variant="outline"
-      size="sm"
-      nativeButton={false}
-      render={
-        <Link href={`/dashboard/recruiter/jobs/new?edit=${job.id}`} />
-      }
-    >
-      <PencilIcon aria-hidden="true" />
-      Update
-    </Button>
-    <Button
-      variant="ghost"
-      size="icon"
-      title={`View ${job.jobTitle}`}
-      aria-label={`View ${job.jobTitle}`}
-    >
-      <EyeIcon />
-    </Button>
-    <Button
-      variant="ghost"
-      size="icon"
-      title={`Delete ${job.jobTitle}`}
-      aria-label={`Delete ${job.jobTitle}`}
-      onClick={() => onDelete(job.id)}
-      className="text-red-600 hover:text-red-600 dark:text-red-400"
-    >
-      <Trash2Icon />
-    </Button>
-  </div>
-)
+const ManageJobsPage = async () => {
 
-/* ------------------------------------------------------------------ */
-/* Page                                                                */
-/* ------------------------------------------------------------------ */
-
-const ManageJobsPage = () => {
-  const [jobs, setJobs] = useState<JobPost[]>(DUMMY_JOBS)
-
-  const deleteJob = (id: string) =>
-    setJobs((current) => current.filter((job) => job.id !== id))
+  const jobs: JobFormValues[] = await getJobs();
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-6">
@@ -159,7 +98,7 @@ const ManageJobsPage = () => {
           </TableHeader>
           <TableBody>
             {jobs.map((job) => (
-              <TableRow key={job.id}>
+              <TableRow key={job._id}>
                 {/* Job title & department */}
                 <TableCell>
                   <div className="font-medium">{job.jobTitle}</div>
@@ -219,7 +158,7 @@ const ManageJobsPage = () => {
 
                 {/* Actions */}
                 <TableCell>
-                  <RowActions job={job} onDelete={deleteJob} />
+                  <JobsRowActions job={job} />
                 </TableCell>
               </TableRow>
             ))}
@@ -240,7 +179,7 @@ const ManageJobsPage = () => {
       {/* ---------------- Mobile: cards (below lg) ---------------- */}
       <div className="space-y-4 lg:hidden">
         {jobs.map((job) => (
-          <Card key={job.id}>
+          <Card key={job._id}>
             <CardContent className="space-y-4">
               {/* Title, status & dept */}
               <div className="flex items-start justify-between gap-3">
@@ -308,7 +247,7 @@ const ManageJobsPage = () => {
               </div>
 
               {/* Actions */}
-              <RowActions job={job} onDelete={deleteJob} />
+              <JobsRowActions job={job}  />
             </CardContent>
           </Card>
         ))}

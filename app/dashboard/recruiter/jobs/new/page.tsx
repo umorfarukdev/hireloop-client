@@ -43,6 +43,7 @@ import { Button } from "@/components/ui/button"
 import { useSession } from "@/lib/auth-client"
 import { createJob } from "@/lib/actions/jobs"
 import { JobFormValues } from "@/type/type"
+import { DEFAULT_VALUES } from "@/lib/jobs"
 
 /* ------------------------------------------------------------------ */
 /* Options (from the Figma "Add New Job" spec)                        */
@@ -78,24 +79,6 @@ const labelOf = (
   value: string
 ) => options.find((option) => option.value === value)?.label
 
-/* ------------------------------------------------------------------ */
-/* Schema — one zod object = all form entries collected on submit      */
-/* ------------------------------------------------------------------ */
-
-const DEFAULT_VALUES: JobFormValues = {
-  jobTitle: "",
-  companyName: "",
-  jobCategory: "",
-  jobType: "full-time",
-  isRemote: false,
-  location: "",
-  deadline: "",
-  minSalary: "",
-  maxSalary: "",
-  salaryFrequency: "year",
-  responsibilities: "",
-  qualifications: "",
-}
 
 /* ------------------------------------------------------------------ */
 /* Page                                                                */

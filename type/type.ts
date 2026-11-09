@@ -7,9 +7,11 @@ export type AuthFormData = {
     role: UserRole
 }
 
+export type JobStatus = "Active" | "Expired"
 
 
 export type JobFormValues = {
+  _id: string
   jobTitle: string
   companyName: string
   jobCategory: string
@@ -17,17 +19,12 @@ export type JobFormValues = {
   isRemote: boolean
   location: string
   deadline?: string
-  minSalary?: string
-  maxSalary?: string
+  minSalary?: number
+  maxSalary?: number
   salaryFrequency: string
   responsibilities: string
   qualifications: string
-}
-
-export type CreateJobPayload = Omit<
-  JobFormValues,
-  "minSalary" | "maxSalary"
-> & {
-  minSalary?: number
-  maxSalary?: number
+  applicants: number
+  status: JobStatus
+  postedAt: string
 }
