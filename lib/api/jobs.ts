@@ -21,7 +21,5 @@ export const getJobById = async ({
   // The API answers 200 with an empty body for a missing job, and 500 for a
   // malformed id — both mean "not found" from the page's perspective.
   if (!res.ok) return null
-  const text = (await res.text()).trim()
-  if (!text) return null
-  return JSON.parse(text)
+  return res.json()
 }

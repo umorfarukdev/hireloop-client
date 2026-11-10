@@ -44,6 +44,7 @@ import { useSession } from "@/lib/auth-client"
 import { createJob } from "@/lib/actions/jobs"
 import { JobFormValues } from "@/type/type"
 import { DEFAULT_VALUES } from "@/lib/jobs"
+import { toast } from "@/components/ui/toast"
 
 /* ------------------------------------------------------------------ */
 /* Options (from the Figma "Add New Job" spec)                        */
@@ -103,13 +104,27 @@ const NewJobAddPage = () => {
       minSalary: data.minSalary ? Number(data.minSalary) : undefined,
       maxSalary: data.maxSalary ? Number(data.maxSalary) : undefined,
       deadline: data.deadline || undefined,
+      postedAt: data.postedAt || "Posted just now",
     }
 
-    console.log("new job form data", payload)
-    setSubmitted(true)
+    try {
+      const result = await createJob(payload)
+      if (!result?.insertedId) throw new Error("No job id returned")
 
-    const result = await createJob(payload)
-    console.log("created job",result)
+      setSubmitted(true)
+      toast.add({
+        type: "success",
+        title: "Job published",
+        description: `"${data.jobTitle}" is now live.`,
+      })
+    } catch {
+      setSubmitted(false)
+      toast.add({
+        type: "error",
+        title: "Could not publish job",
+        description: "Something went wrong. Please try again.",
+      })
+    }
   }
 
   const salaryText =
@@ -167,8 +182,7 @@ const NewJobAddPage = () => {
                 role="status"
                 className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-600 dark:text-emerald-400"
               >
-                Job details collected successfully — see the browser console for
-                the submitted data.
+                Job published successfully — find it in Manage Jobs.
               </div>
             )}
 
@@ -180,6 +194,7 @@ const NewJobAddPage = () => {
                 <FormField
                   control={form.control}
                   name="jobTitle"
+                  rules={{ required: "Job title is required" }}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
@@ -196,6 +211,7 @@ const NewJobAddPage = () => {
                 <FormField
                   control={form.control}
                   name="companyName"
+                  rules={{ required: "Company name is required" }}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
@@ -213,6 +229,7 @@ const NewJobAddPage = () => {
               <FormField
                 control={form.control}
                 name="jobCategory"
+                rules={{ required: "Job category is required" }}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
@@ -310,6 +327,7 @@ const NewJobAddPage = () => {
                 <FormField
                   control={form.control}
                   name="location"
+                  rules={{ required: "Job location is required" }}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
@@ -342,6 +360,15 @@ const NewJobAddPage = () => {
                 <FormField
                   control={form.control}
                   name="minSalary"
+                  rules={{
+                    validate: (value) => {
+                      if (value === undefined) return true
+                      const n = Number(value)
+                      return (
+                        (Number.isFinite(n) && n >= 0) || "Enter a valid salary"
+                      )
+                    },
+                  }}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Min Salary / Rate</FormLabel>
@@ -352,6 +379,12 @@ const NewJobAddPage = () => {
                           min={0}
                           placeholder="80000"
                           {...field}
+                          value={field.value ?? ""}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value === "" ? undefined : Number(e.target.value)
+                            )
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -362,6 +395,18 @@ const NewJobAddPage = () => {
                 <FormField
                   control={form.control}
                   name="maxSalary"
+                  rules={{
+                    validate: (value) => {
+                      if (value === undefined) return true
+                      const max = Number(value)
+                      if (!Number.isFinite(max) || max < 0)
+                        return "Enter a valid salary"
+                      const min = Number(form.getValues("minSalary"))
+                      if (form.getValues("minSalary") !== undefined && max < min)
+                        return "Max salary must be ≥ min salary"
+                      return true
+                    },
+                  }}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Max Salary / Rate</FormLabel>
@@ -372,6 +417,12 @@ const NewJobAddPage = () => {
                           min={0}
                           placeholder="120000"
                           {...field}
+                          value={field.value ?? ""}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value === "" ? undefined : Number(e.target.value)
+                            )
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -425,6 +476,7 @@ const NewJobAddPage = () => {
               <FormField
                 control={form.control}
                 name="responsibilities"
+                rules={{ required: "Key responsibilities are required" }}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
@@ -446,6 +498,7 @@ const NewJobAddPage = () => {
               <FormField
                 control={form.control}
                 name="qualifications"
+                rules={{ required: "Qualifications are required" }}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
