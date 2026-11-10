@@ -3,8 +3,8 @@ import { JobFormValues } from "@/type/type"
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
 
-export const getJobs = async (): Promise<JobFormValues[]> => {
-  const res = await fetch(`${BASE_URL}/jobs`, { cache: "no-store" })
+export const getJobs = async (query = " "): Promise<JobFormValues[]> => {
+  const res = await fetch(`${BASE_URL}/jobs?${query}`, { cache: "no-store" })
   if (!res.ok) {
     console.error("Failed to fetch jobs:", res.statusText)
     return []
