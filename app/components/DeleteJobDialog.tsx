@@ -25,15 +25,29 @@ const DeleteJobDialog = ({ job }: { job: JobFormValues }) => {
   const router = useRouter()
 
   const handleDelete = async () => {
-    const res = await deleteJob(job._id)
-    console.log("Deleting", job._id, res)
-    if (res.deletedCount) {
-      setOpen(false)
+    try {
+      const res = await deleteJob(job._id)
+      if (res?.deletedCount) {
+        setOpen(false)
+        toast.add({
+          type: "success",
+          title: "Job deleted",
+          description: `"${job.jobTitle}" was removed permanently.`,
+        })
+        router.refresh()
+      } else {
+        toast.add({
+          type: "error",
+          title: "Could not delete job",
+          description: "Something went wrong. Please try again.",
+        })
+      }
+    } catch {
       toast.add({
-        title: "Job is permanently deleted",
-        description: "Sunday, December 3 at 9:00 AM",
+        type: "error",
+        title: "Could not delete job",
+        description: "Something went wrong. Please try again.",
       })
-      router.refresh()
     }
   }
   return (

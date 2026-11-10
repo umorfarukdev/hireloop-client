@@ -11,7 +11,9 @@ import {
   type LucideIcon,
 } from "lucide-react"
 
-import { AuthFormData, UserRole } from "@/type/type"
+import { AuthFormData, AuthSubmitHandler, UserRole } from "@/type/type"
+
+export type { AuthSubmitHandler }
 import { Logo } from "@/components/site/logo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -25,13 +27,6 @@ const ROLES: Array<{ value: UserRole; label: string; icon: LucideIcon }> = [
   { value: "recruiter", label: "Recruiter", icon: BriefcaseBusinessIcon },
   { value: "admin", label: "Admin", icon: ShieldCheckIcon },
 ]
-
-// Optional hook for real auth logic (e.g. better-auth). Receives the
-// collected form values. Return better-auth's `{ error }` shape or
-// throw to surface an inline error message on the form.
-export type AuthSubmitHandler = (
-  data: AuthFormData
-) => Promise<unknown> | unknown
 
 const COPY: Record<
   Mode,
@@ -86,7 +81,6 @@ export function AuthForm({
 
     if (!onSubmit) {
       // No handler wired yet — just surface the collected data.
-      console.log("form data", formData)
       setLoading(true)
       setTimeout(() => setLoading(false), 600)
       return

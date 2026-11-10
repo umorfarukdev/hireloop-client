@@ -9,17 +9,18 @@ import { useRouter } from "next/navigation"
 const SignUpPage = () => {
   const router = useRouter()
   const handleSignUp = async (data: AuthFormData) => {
-    const { data: signUpResponse, error } = await signUp.email({
+    const { error } = await signUp.email({
       name: data.name,
       email: data.email,
       password: data.password,
       role: data.role,
     })
-    console.log("signUpResponse", signUpResponse, "error", error)
 
-    if(!error) {
+    if (!error) {
       router.push("/")
     }
+    // Surface better-auth errors inline (AuthForm's `{ error }` contract).
+    return { error }
   }
 
   return <AuthForm mode="signup" onSubmit={handleSignUp} />

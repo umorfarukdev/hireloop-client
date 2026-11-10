@@ -1,10 +1,5 @@
 import Link from "next/link"
-import {
-  ChevronRightIcon,
-  MapPinIcon,
-  PlusIcon,
-  UsersIcon,
-} from "lucide-react"
+import { MapPinIcon, PlusIcon, UsersIcon } from "lucide-react"
 
 import {
   Table,
@@ -18,27 +13,17 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { getJobs } from "@/lib/api/jobs"
-import { departmentOf, formatDate, formatLocation, formatSalary, JOB_TYPES, JobPost, labelOf } from "@/lib/jobs"
+import {
+  departmentOf,
+  formatDate,
+  formatLocation,
+  formatSalary,
+  typeLabelOf,
+} from "@/lib/jobs"
 import JobsRowActions from "@/app/components/JobsRowActions"
+import PageHeader from "@/app/components/PageHeader"
+import StatusBadge from "@/app/components/StatusBadge"
 import { JobFormValues } from "@/type/type"
-
-/* ------------------------------------------------------------------ */
-/* Status badge — Active (green) / Expired (red)                       */
-/* ------------------------------------------------------------------ */
-
-export const StatusBadge = ({ status }: { status: JobPost["status"] }) => (
-  <Badge
-    variant="outline"
-    className={
-      status === "Active"
-        ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-        : "border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400"
-    }
-  >
-    {status}
-  </Badge>
-)
-
 
 const ManageJobsPage = async () => {
 
@@ -47,39 +32,24 @@ const ManageJobsPage = async () => {
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-6">
       {/* Top breadcrumb & page heading */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-1">
-          <nav
-            aria-label="Breadcrumb"
-            className="flex items-center gap-1.5 text-sm"
+      <PageHeader
+        crumbs={[
+          { label: "Manage Jobs" },
+          { label: "Job Listings & Postings" },
+        ]}
+        title="Manage Job Posts"
+        description="Review live listings, monitor applicants, and update job details across your organization."
+        actions={
+          <Button
+            className="self-start shrink-0"
+            nativeButton={false}
+            render={<Link href="/dashboard/recruiter/jobs/new" />}
           >
-            <span className="text-muted-foreground">Manage Jobs</span>
-            <ChevronRightIcon
-              className="size-3.5 text-muted-foreground"
-              aria-hidden="true"
-            />
-            <span className="font-medium">Job Listings &amp; Postings</span>
-          </nav>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Manage Job Posts
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Review live listings, monitor applicants, and update job details
-            across your organization.
-          </p>
-        </div>
-
-        <Button
-          className="self-start shrink-0"
-          nativeButton={false}
-          render={
-            <Link href="/dashboard/recruiter/jobs/new" />
-          }
-        >
-          <PlusIcon aria-hidden="true" />
-          New Job Post
-        </Button>
-      </div>
+            <PlusIcon aria-hidden="true" />
+            New Job Post
+          </Button>
+        }
+      />
 
       {/* ---------------- Desktop: table (lg and up) ---------------- */}
       <div className="hidden overflow-x-auto rounded-xl border bg-card lg:block">
@@ -119,7 +89,7 @@ const ManageJobsPage = async () => {
                 {/* Type */}
                 <TableCell>
                   <Badge variant="secondary">
-                    {labelOf(JOB_TYPES, job.jobType) ?? job.jobType}
+                    {typeLabelOf(job)}
                   </Badge>
                 </TableCell>
 
@@ -208,7 +178,7 @@ const ManageJobsPage = async () => {
                 <div>
                   <div className="text-xs text-muted-foreground">Type</div>
                   <Badge variant="secondary" className="mt-1">
-                    {labelOf(JOB_TYPES, job.jobType) ?? job.jobType}
+                    {typeLabelOf(job)}
                   </Badge>
                 </div>
                 <div>

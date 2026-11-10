@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import Link from "next/link"
 import {
   ArrowLeftIcon,
@@ -13,6 +14,7 @@ import {
   TreePalmIcon,
   UsersRoundIcon,
   WalletIcon,
+  type LucideIcon,
 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -24,10 +26,11 @@ import {
   formatLocation,
   formatSalary,
   JOB_CATEGORIES,
-  JOB_TYPES,
-  labelOf,
+  typeLabelOf,
 } from "@/lib/jobs"
 import JobDetailActions from "@/app/components/JobDetailActions"
+import StatusBadge, { successBadgeClass } from "@/app/components/StatusBadge"
+import { cn } from "cn"
 
 /* ------------------------------------------------------------------ */
 /* Static content from the Figma "Public / Job Details" frame          */
@@ -47,6 +50,63 @@ const toBullets = (text: string): string[] =>
     .flatMap((line) => line.split(/(?<=[.!?])\s+/))
     .map((item) => item.trim())
     .filter(Boolean)
+
+/* ------------------------------------------------------------------ */
+/* Small local building blocks (repeated across sections)              */
+/* ------------------------------------------------------------------ */
+
+const DetailSection = ({
+  title,
+  children,
+}: {
+  title: string
+  children: ReactNode
+}) => (
+  <section className="space-y-3 p-5 md:p-6">
+    <h2 className="text-base font-semibold">{title}</h2>
+    {children}
+  </section>
+)
+
+const BulletList = ({
+  items,
+  emptyText,
+}: {
+  items: string[]
+  emptyText: string
+}) =>
+  items.length > 0 ? (
+    <ul className="space-y-2.5">
+      {items.map((item) => (
+        <li key={item} className="flex gap-2.5 text-sm">
+          <CircleCheckIcon
+            className="mt-0.5 size-4 shrink-0 text-primary"
+            aria-hidden="true"
+          />
+          <span className="text-muted-foreground">{item}</span>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p className="text-sm text-muted-foreground">{emptyText}</p>
+  )
+
+const IconTile = ({
+  icon: Icon,
+  className,
+}: {
+  icon: LucideIcon
+  className?: string
+}) => (
+  <div
+    className={cn(
+      "flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary",
+      className
+    )}
+  >
+    <Icon className="size-4.5" aria-hidden="true" />
+  </div>
+)
 
 /* ------------------------------------------------------------------ */
 /* Page                                                                */
@@ -80,7 +140,7 @@ const JobDetailsPage = async ({
     )
   }
 
-  const typeLabel = labelOf(JOB_TYPES, job.jobType) ?? job.jobType
+  const typeLabel = typeLabelOf(job)
   const department = departmentOf(job)
   const salary = formatSalary(job.minSalary, job.maxSalary, job.salaryFrequency)
   const location = formatLocation(job)
@@ -157,7 +217,7 @@ const JobDetailsPage = async ({
                 <span className="font-medium">{job.companyName}</span>
                 <Badge
                   variant="outline"
-                  className="gap-1 border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  className={cn("gap-1", successBadgeClass)}
                 >
                   <BadgeCheckIcon className="size-3" aria-hidden="true" />
                   Verified Employer
@@ -166,16 +226,7 @@ const JobDetailsPage = async ({
 
               {/* Meta row */}
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                <Badge
-                  variant="outline"
-                  className={
-                    job.status === "Active"
-                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                      : "border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400"
-                  }
-                >
-                  {job.status}
-                </Badge>
+                <StatusBadge status={job.status} />
                 <span className="inline-flex items-center gap-1.5">
                   <UsersRoundIcon className="size-4" aria-hidden="true" />
                   {job.applicants} Candidates
@@ -199,13 +250,8 @@ const JobDetailsPage = async ({
           {/* Bento info grid */}
           <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
             {facts.map(({ icon: Icon, label, value }) => (
-              <div
-                key={label}
-                className="rounded-xl border bg-card p-4"
-              >
-                <div className="mb-3 flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <Icon className="size-4.5" aria-hidden="true" />
-                </div>
+              <div key={label} className="rounded-xl border bg-card p-4">
+                <IconTile icon={Icon} className="mb-3" />
                 <div className="text-xs font-medium tracking-wide text-muted-foreground">
                   {label}
                 </div>
@@ -219,74 +265,42 @@ const JobDetailsPage = async ({
           {/* Content sections */}
           <div className="divide-y rounded-xl border bg-card">
             {/* Job Description */}
-            <section className="space-y-3 p-5 md:p-6">
-              <h2 className="text-base font-semibold">Job Description</h2>
+            <DetailSection title="Job Description">
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {description}
               </p>
-            </section>
+            </DetailSection>
 
             {/* Responsibilities */}
-            <section className="space-y-3 p-5 md:p-6">
-              <h2 className="text-base font-semibold">Responsibilities</h2>
-              {responsibilityBullets.length > 0 ? (
-                <ul className="space-y-2.5">
-                  {responsibilityBullets.map((item) => (
-                    <li key={item} className="flex gap-2.5 text-sm">
-                      <CircleCheckIcon
-                        className="mt-0.5 size-4 shrink-0 text-primary"
-                        aria-hidden="true"
-                      />
-                      <span className="text-muted-foreground">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  No responsibilities listed yet.
-                </p>
-              )}
-            </section>
+            <DetailSection title="Responsibilities">
+              <BulletList
+                items={responsibilityBullets}
+                emptyText="No responsibilities listed yet."
+              />
+            </DetailSection>
 
             {/* Requirements */}
-            <section className="space-y-3 p-5 md:p-6">
-              <h2 className="text-base font-semibold">Requirements</h2>
-              {requirementBullets.length > 0 ? (
-                <ul className="space-y-2.5">
-                  {requirementBullets.map((item) => (
-                    <li key={item} className="flex gap-2.5 text-sm">
-                      <CircleCheckIcon
-                        className="mt-0.5 size-4 shrink-0 text-primary"
-                        aria-hidden="true"
-                      />
-                      <span className="text-muted-foreground">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  No requirements listed yet.
-                </p>
-              )}
-            </section>
+            <DetailSection title="Requirements">
+              <BulletList
+                items={requirementBullets}
+                emptyText="No requirements listed yet."
+              />
+            </DetailSection>
 
             {/* Benefits */}
-            <section className="space-y-3 p-5 md:p-6">
-              <h2 className="text-base font-semibold">Benefits</h2>
+            <DetailSection title="Benefits">
               <div className="grid gap-3 sm:grid-cols-2">
                 {BENEFITS.map(({ icon: Icon, label }) => (
                   <div
                     key={label}
                     className="flex items-center gap-3 rounded-lg border bg-muted/40 p-4"
                   >
-                    <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <Icon className="size-4.5" aria-hidden="true" />
-                    </div>
+                    <IconTile icon={Icon} className="shrink-0" />
                     <span className="text-sm font-medium">{label}</span>
                   </div>
                 ))}
               </div>
-            </section>
+            </DetailSection>
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import { JobFormValues, JobStatus } from "@/type/type";
+import { JobFormValues } from "@/type/type";
 
 export const JOB_CATEGORIES = [
   { value: "engineering", label: "Engineering & Tech", short: "Engineering" },
@@ -32,6 +32,10 @@ export const labelOf = (
   value: string
 ) => options.find((option) => option.value === value)?.label
 
+/** Display label for a job type ("full-time" → "Full-time"). */
+export const typeLabelOf = (job: { jobType: string }): string =>
+  labelOf(JOB_TYPES, job.jobType) ?? job.jobType
+
 /** Short department name for the table's "JOB TITLE & DEPT" column. */
 export const shortLabelOf = (
   options: Array<{ value: string; short: string }>,
@@ -57,24 +61,8 @@ export const DEFAULT_VALUES: JobFormValues = {
   postedAt: "",
 }
 
-/* ------------------------------------------------------------------ */
-/* Persisted job post = exactly what the form submits, plus the       */
-/* extra fields the manage-jobs table needs.                          */
-/* ------------------------------------------------------------------ */
-
-
-
-export type JobPost =  {
-  id: string
-  applicants: number
-  status: JobStatus
-  postedAt: string
-}
-
 /** Form values → submitted payload (salary strings become numbers). */
-export function toJobPayload(
-  data: JobFormValues
-): Omit<JobPost, "id" | "applicants" | "status" | "postedAt"> {
+export function toJobPayload(data: JobFormValues): JobFormValues {
   return {
     ...data,
     minSalary: data.minSalary ? Number(data.minSalary) : undefined,

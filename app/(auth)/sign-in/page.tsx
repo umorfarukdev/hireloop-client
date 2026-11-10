@@ -8,12 +8,13 @@ import { signIn } from "@/lib/auth-client"
 const SignInPage = () => {
 
     const handleSignIn = async (data: AuthFormData) => {
-      const { data: signInResponse, error } = await signIn.email({
+      const { error } = await signIn.email({
         email: data.email,
         password: data.password,
         callbackURL: "/",
       })
-      console.log("signInResponse", signInResponse, "error", error)
+      // Surface better-auth errors inline (AuthForm's `{ error }` contract).
+      return { error }
     }
   
   return <AuthForm mode="signin" onSubmit={handleSignIn} />

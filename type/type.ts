@@ -28,3 +28,16 @@ export type JobFormValues = {
   status: JobStatus
   postedAt: string
 }
+
+/* Persisted job post = exactly what the form submits, plus the
+   extra fields the manage-jobs table needs. */
+export type JobPost = {
+  id: string
+  applicants: number
+  status: JobStatus
+  postedAt: string
+}
+
+/* AuthForm submit contract — better-auth style: resolves with
+   `{ error }` instead of throwing. */
+export type AuthSubmitHandler = (data: AuthFormData) => Promise<unknown> | unknown

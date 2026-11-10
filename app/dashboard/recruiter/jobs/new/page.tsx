@@ -5,7 +5,6 @@ import Link from "next/link"
 import { useForm } from "react-hook-form"
 
 import {
-  ChevronRightIcon,
   Clock3Icon,
   Globe2Icon,
   MapPinIcon,
@@ -43,47 +42,36 @@ import { Button } from "@/components/ui/button"
 import { useSession } from "@/lib/auth-client"
 import { createJob } from "@/lib/actions/jobs"
 import { JobFormValues } from "@/type/type"
-import { DEFAULT_VALUES } from "@/lib/jobs"
+import {
+  DEFAULT_VALUES,
+  JOB_CATEGORIES,
+  JOB_TYPES,
+  SALARY_FREQUENCIES,
+  labelOf,
+  toJobPayload,
+} from "@/lib/jobs"
 import { toast } from "@/components/ui/toast"
-
-/* ------------------------------------------------------------------ */
-/* Options (from the Figma "Add New Job" spec)                        */
-/* ------------------------------------------------------------------ */
-
-const JOB_CATEGORIES = [
-  { value: "engineering", label: "Engineering & Tech" },
-  { value: "design", label: "Design & Creative" },
-  { value: "marketing", label: "Marketing & PR" },
-  { value: "sales", label: "Sales & Business Dev" },
-  { value: "finance", label: "Finance & Legal" },
-  { value: "operations", label: "Operations & HR" },
-  { value: "support", label: "Customer Support" },
-]
-
-const JOB_TYPES = [
-  { value: "full-time", label: "Full-time" },
-  { value: "part-time", label: "Part-time" },
-  { value: "contract", label: "Contract" },
-  { value: "internship", label: "Internship" },
-]
-
-const SALARY_FREQUENCIES = [
-  { value: "hour", label: "per hour" },
-  { value: "day", label: "per day" },
-  { value: "week", label: "per week" },
-  { value: "month", label: "per month" },
-  { value: "year", label: "per year" },
-]
-
-const labelOf = (
-  options: Array<{ value: string; label: string }>,
-  value: string
-) => options.find((option) => option.value === value)?.label
-
+import PageHeader from "@/app/components/PageHeader"
+import { successBadgeClass } from "@/app/components/StatusBadge"
+import { cn } from "cn"
 
 /* ------------------------------------------------------------------ */
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
+
+/** Card wrapper for each numbered form section. */
+const FormSection = ({
+  title,
+  children,
+}: {
+  title: string
+  children: React.ReactNode
+}) => (
+  <section className="space-y-4 rounded-xl border bg-card p-5">
+    <h2 className="text-sm font-semibold">{title}</h2>
+    {children}
+  </section>
+)
 
 const NewJobAddPage = () => {
   const [submitted, setSubmitted] = useState(false)
@@ -98,12 +86,9 @@ const NewJobAddPage = () => {
   const values = form.watch()
 
   async function onSubmit(data: JobFormValues) {
-    // Collected form entries — convert salary strings to numbers for the API.
-    const payload = {
-      ...data,
-      minSalary: data.minSalary ? Number(data.minSalary) : undefined,
-      maxSalary: data.maxSalary ? Number(data.maxSalary) : undefined,
-      deadline: data.deadline || undefined,
+    // Collected form entries — toJobPayload normalizes salaries/deadline.
+    const payload: JobFormValues = {
+      ...toJobPayload(data),
       postedAt: data.postedAt || "Posted just now",
     }
 
@@ -142,31 +127,14 @@ const NewJobAddPage = () => {
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-6">
       {/* Top breadcrumb & page heading */}
-      <div className="space-y-1">
-        <nav
-          aria-label="Breadcrumb"
-          className="flex items-center gap-1.5 text-sm"
-        >
-          <Link
-            href="/dashboard/recruiter/jobs"
-            className="text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Manage Jobs
-          </Link>
-          <ChevronRightIcon
-            className="size-3.5 text-muted-foreground"
-            aria-hidden="true"
-          />
-          <span className="font-medium">Create New Listing</span>
-        </nav>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Post a New Job
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Fill in the position specifications to attract qualified talent across
-          our network.
-        </p>
-      </div>
+      <PageHeader
+        crumbs={[
+          { label: "Manage Jobs", href: "/dashboard/recruiter/jobs" },
+          { label: "Create New Listing" },
+        ]}
+        title="Post a New Job"
+        description="Fill in the position specifications to attract qualified talent across our network."
+      />
 
       {/* Form 60% + Live Preview 40% */}
       <div className="grid gap-6 lg:grid-cols-[3fr_2fr]">
@@ -180,16 +148,17 @@ const NewJobAddPage = () => {
             {submitted && (
               <div
                 role="status"
-                className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-600 dark:text-emerald-400"
+                className={cn(
+                  successBadgeClass,
+                  "rounded-lg border px-4 py-3 text-sm"
+                )}
               >
                 Job published successfully — find it in Manage Jobs.
               </div>
             )}
 
             {/* Section 1: Basic Information */}
-            <section className="space-y-4 rounded-xl border bg-card p-5">
-              <h2 className="text-sm font-semibold">1. Basic Information</h2>
-
+            <FormSection title="1. Basic Information">
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormField
                   control={form.control}
@@ -291,13 +260,10 @@ const NewJobAddPage = () => {
                   </FormItem>
                 )}
               />
-            </section>
+            </FormSection>
 
             {/* Section 2: Location, Compensation & Timeline */}
-            <section className="space-y-4 rounded-xl border bg-card p-5">
-              <h2 className="text-sm font-semibold">
-                2. Location, Compensation &amp; Timeline
-              </h2>
+            <FormSection title="2. Location, Compensation & Timeline">
 
               <FormField
                 control={form.control}
@@ -465,13 +431,10 @@ const NewJobAddPage = () => {
                   )}
                 />
               </div>
-            </section>
+            </FormSection>
 
             {/* Section 3: Responsibilities & Requirements */}
-            <section className="space-y-4 rounded-xl border bg-card p-5">
-              <h2 className="text-sm font-semibold">
-                3. Responsibilities &amp; Requirements
-              </h2>
+            <FormSection title="3. Responsibilities & Requirements">
 
               <FormField
                 control={form.control}
@@ -516,7 +479,7 @@ const NewJobAddPage = () => {
                   </FormItem>
                 )}
               />
-            </section>
+            </FormSection>
 
             {/* Actions */}
             <div className="flex justify-end gap-3">
