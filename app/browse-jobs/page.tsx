@@ -1,25 +1,23 @@
-import { getJobs } from '@/lib/api/jobs';
-import React from 'react';
+import { SiteNavbar } from "@/components/site/navbar"
+import { getJobs } from "@/lib/api/jobs"
+import BrowseJobs from "./BrowseJobs"
 
-const BrowseJobsPage = async ({searchParams} : {searchParams: Promise<{[key: string]: string | string[] | undefined}>}) => {
-    const search = await searchParams;
-    const urlSearch = new URLSearchParams(search as Record<string, string>);
-    const query = urlSearch.toString();
-    console.log(query);
+/* ------------------------------------------------------------------ */
+/* Public Browse Jobs (Figma "Public / Browse Jobs") — server fetches  */
+/* every job once; all search/filter/sort runs client-side.           */
+/* ------------------------------------------------------------------ */
 
-    const jobs = await getJobs(query);
+const BrowseJobsPage = async () => {
+  const jobs = await getJobs()
 
-    return (
-        <div>
-            <h1>Browse Jobs</h1>
-            <ul>
-                {jobs.map((job) => (
-                    <li key={job._id}>
-                        <h2>{job.jobTitle}</h2>
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
-}   
-export default BrowseJobsPage;
+  return (
+    <div className="min-h-svh">
+      <SiteNavbar />
+      <main className="pt-8">
+        <BrowseJobs jobs={jobs} />
+      </main>
+    </div>
+  )
+}
+
+export default BrowseJobsPage

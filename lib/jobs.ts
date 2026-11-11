@@ -114,7 +114,11 @@ export function formatDate(iso?: string): string {
 
 /** "Remote (New York, USA)" for remote posts, location as-is otherwise. */
 export function formatLocation(job: { isRemote: boolean; location: string }) {
-  return job.isRemote ? `Remote (${job.location})` : job.location
+  if (!job.isRemote) return job.location
+  // Avoid the redundant "Remote (Remote)".
+  return job.location.toLowerCase() === "remote"
+    ? "Remote"
+    : `Remote (${job.location})`
 }
 
 /** Department shown in the table = the form's job category (short name). */

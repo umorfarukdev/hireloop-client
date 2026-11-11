@@ -36,7 +36,7 @@ export function SiteNavbar() {
   const { data: session } = useSession()
 
   const NAV_LINKS = [
-  { href: "/jobs", label: "Browse Jobs", icon: BriefcaseBusinessIcon },
+  { href: "/browse-jobs", label: "Browse Jobs", icon: BriefcaseBusinessIcon },
   { href: "/company", label: "Company", icon: Building2Icon },
   { href: "/pricing", label: "Pricing", icon: TagsIcon },
   { href: `/dashboard/${session?.user?.role || "seeker"}`, label: "Dashboard", icon: Building2Icon},
