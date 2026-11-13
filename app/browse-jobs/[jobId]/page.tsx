@@ -31,6 +31,7 @@ import {
 import JobDetailActions from "@/app/components/JobDetailActions"
 import StatusBadge, { successBadgeClass } from "@/app/components/StatusBadge"
 import { cn } from "cn"
+import JobApplyButton from "@/app/components/JobApplyButton"
 
 /* ------------------------------------------------------------------ */
 /* Static content from the Figma "Public / Job Details" frame          */
@@ -120,6 +121,8 @@ const JobDetailsPage = async ({
   const { jobId } = await params
   const job = await getJobById({ jobId })
 
+
+
   /* ---------------- Not found ---------------- */
   if (!job) {
     return (
@@ -180,6 +183,8 @@ const JobDetailsPage = async ({
     },
   ]
 
+
+
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-6">
       {/* Back link */}
@@ -239,7 +244,7 @@ const JobDetailsPage = async ({
           {/* Actions */}
           <div className="flex shrink-0 items-center gap-2">
             <JobDetailActions />
-            <Button type="button">Apply Now</Button>
+            <JobApplyButton job={job} />
           </div>
         </div>
       </header>

@@ -41,3 +41,11 @@ export type JobPost = {
 /* AuthForm submit contract — better-auth style: resolves with
    `{ error }` instead of throwing. */
 export type AuthSubmitHandler = (data: AuthFormData) => Promise<unknown> | unknown
+
+export type JobApplication = {
+  jobId: string
+  userId: string
+  userEmail: string
+  jobTitle: string
+  companyName: string
+}

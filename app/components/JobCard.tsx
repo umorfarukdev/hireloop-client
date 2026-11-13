@@ -16,6 +16,7 @@ import { successBadgeClass } from "@/app/components/StatusBadge"
 import { JobFormValues } from "@/type/type"
 import { cn } from "cn"
 
+
 /* ------------------------------------------------------------------ */
 /* Browse Jobs listing card (Figma "Article - Job Card"): logo, title, */
 /* company·location, salary + type chips, Easy Apply, save button.     */
@@ -25,13 +26,16 @@ import { cn } from "cn"
 const JobCard = ({ job }: { job: JobFormValues }) => {
   const [saved, setSaved] = useState(false)
 
+  
   const initials = job.companyName
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((word) => word[0]?.toUpperCase() ?? "")
-    .join("")
-
+  .split(/\s+/)
+  .slice(0, 2)
+  .map((word) => word[0]?.toUpperCase() ?? "")
+  .join("")
+  
   const salary = formatSalary(job.minSalary, job.maxSalary, job.salaryFrequency)
+  
+
 
   return (
     <article className="relative flex flex-col gap-4 rounded-xl border bg-card p-5 transition-shadow hover:shadow-md">
@@ -48,7 +52,7 @@ const JobCard = ({ job }: { job: JobFormValues }) => {
           {/* Title links to Job Details */}
           <h3 className="pr-8 font-semibold leading-snug">
             <Link
-              href={`/dashboard/recruiter/jobs/${job._id}`}
+              href={`/browse-jobs/${job._id}`}
               className="transition-colors hover:text-primary after:absolute after:inset-0"
             >
               {job.jobTitle}
