@@ -20,7 +20,7 @@ const JobApplyButton = ({ job }: { job: JobFormValues }) => {
       const countResult = await getApplicationsCount(`userId=${user.id}`)
 
       if (countResult.count >= 10) {
-        router.push("/payment")
+        router.push("/checkout")
         return
       } else {
         const application = {
