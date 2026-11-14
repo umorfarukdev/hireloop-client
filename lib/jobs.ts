@@ -44,6 +44,7 @@ export const shortLabelOf = (
 
 export const DEFAULT_VALUES: JobFormValues = {
   _id: "",
+  jobId: "",
   jobTitle: "",
   companyName: "",
   jobCategory: "",

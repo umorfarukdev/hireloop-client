@@ -4,13 +4,22 @@ import { useState } from "react"
 import { BookmarkIcon, CheckIcon, Share2Icon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { JobFormValues } from "@/type/type"
+import { useSaveJob } from "@/lib/useSaveJob"
+import { cn } from "cn"
 
 /* ------------------------------------------------------------------ */
-/* Header actions — Save (toggle) / Share (copy link)                  */
+/* Header actions — Save (persists to Saved Jobs) / Share (copy link)  */
 /* ------------------------------------------------------------------ */
 
-const JobDetailActions = () => {
-  const [saved, setSaved] = useState(false)
+const JobDetailActions = ({
+  job,
+  initialSaved = false,
+}: {
+  job: JobFormValues
+  initialSaved?: boolean
+}) => {
+  const { saved, pending, toggleSave } = useSaveJob(job, initialSaved)
   const [copied, setCopied] = useState(false)
 
   const share = async () => {
@@ -30,8 +39,9 @@ const JobDetailActions = () => {
         size="icon"
         aria-label={saved ? "Remove from saved jobs" : "Save job"}
         aria-pressed={saved}
-        onClick={() => setSaved((value) => !value)}
-        className={saved ? "border-primary text-primary" : undefined}
+        disabled={pending}
+        onClick={toggleSave}
+        className={cn(saved && "border-primary text-primary")}
       >
         <BookmarkIcon className={saved ? "fill-current" : undefined} />
       </Button>

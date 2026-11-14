@@ -19,7 +19,9 @@ import {
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { getSavedJobIds } from "@/lib/actions/savedJobs"
 import { getJobById } from "@/lib/api/jobs"
+import { auth } from "@/lib/auth"
 import {
   departmentOf,
   formatDate,
@@ -32,6 +34,7 @@ import JobDetailActions from "@/app/components/JobDetailActions"
 import StatusBadge, { successBadgeClass } from "@/app/components/StatusBadge"
 import { cn } from "cn"
 import JobApplyButton from "@/app/components/JobApplyButton"
+import { headers } from "next/headers"
 
 /* ------------------------------------------------------------------ */
 /* Static content from the Figma "Public / Job Details" frame          */
@@ -120,6 +123,13 @@ const JobDetailsPage = async ({
 }) => {
   const { jobId } = await params
   const job = await getJobById({ jobId })
+
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+  const savedIds = session?.user
+    ? await getSavedJobIds(session.user.email)
+    : []
 
 
 
@@ -243,7 +253,10 @@ const JobDetailsPage = async ({
 
           {/* Actions */}
           <div className="flex shrink-0 items-center gap-2">
-            <JobDetailActions />
+            <JobDetailActions
+              job={job}
+              initialSaved={savedIds.includes(job._id)}
+            />
             <JobApplyButton job={job} />
           </div>
         </div>

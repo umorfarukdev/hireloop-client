@@ -22,7 +22,13 @@ const PAGE_SIZE = 6
 const humanize = (value: string) =>
   value.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
 
-const BrowseJobs = ({ jobs }: { jobs: JobFormValues[] }) => {
+const BrowseJobs = ({
+  jobs,
+  savedIds = [],
+}: {
+  jobs: JobFormValues[]
+  savedIds?: string[]
+}) => {
   const [query, setQuery] = useState("")
   const [jobTypes, setJobTypes] = useState<string[]>([])
   const [categories, setCategories] = useState<string[]>([])
@@ -224,6 +230,7 @@ const BrowseJobs = ({ jobs }: { jobs: JobFormValues[] }) => {
           page={currentPage}
           pageCount={pageCount}
           sort={sort}
+          savedIds={savedIds}
           onSortChange={(value) => {
             setSort(value)
             setPage(1)

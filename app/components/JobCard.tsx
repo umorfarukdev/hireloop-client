@@ -1,20 +1,17 @@
 "use client"
-
-import { useState } from "react"
 import Link from "next/link"
 import {
-  BookmarkIcon,
   BriefcaseIcon,
   MapPinIcon,
   WalletIcon,
 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { formatLocation, formatSalary, typeLabelOf } from "@/lib/jobs"
 import { successBadgeClass } from "@/app/components/StatusBadge"
 import { JobFormValues } from "@/type/type"
 import { cn } from "cn"
+import SaveJobButton from "./SaveJobButton"
 
 
 /* ------------------------------------------------------------------ */
@@ -23,8 +20,13 @@ import { cn } from "cn"
 /* Clicking the card opens Job Details.                                */
 /* ------------------------------------------------------------------ */
 
-const JobCard = ({ job }: { job: JobFormValues }) => {
-  const [saved, setSaved] = useState(false)
+const JobCard = ({
+  job,
+  savedIds = [],
+}: {
+  job: JobFormValues
+  savedIds?: string[]
+}) => {
 
   
   const initials = job.companyName
@@ -69,20 +71,7 @@ const JobCard = ({ job }: { job: JobFormValues }) => {
         </div>
 
         {/* Save toggle */}
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          aria-label={saved ? "Remove from saved jobs" : "Save job"}
-          aria-pressed={saved}
-          onClick={() => setSaved((value) => !value)}
-          className="relative z-10 shrink-0"
-        >
-          <BookmarkIcon
-            className={cn(saved && "fill-current text-primary")}
-            aria-hidden="true"
-          />
-        </Button>
+        <SaveJobButton job={job} initialSaved={savedIds.includes(job._id)} />
       </div>
 
       {/* Salary + type chips */}

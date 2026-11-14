@@ -12,6 +12,7 @@ export type JobStatus = "Active" | "Expired"
 
 export type JobFormValues = {
   _id: string
+  jobId: string
   jobTitle: string
   companyName: string
   jobCategory: string
@@ -42,10 +43,36 @@ export type JobPost = {
    `{ error }` instead of throwing. */
 export type AuthSubmitHandler = (data: AuthFormData) => Promise<unknown> | unknown
 
+/* Application lifecycle shown on the seeker's My Applications page. */
+export type ApplicationStatus =
+  | "Applied"
+  | "Review"
+  | "Interview"
+  | "Shortlisted"
+  | "Rejected"
+  | "Offered"
+
+/* One row of GET /applications/:email — what the apply form posts, plus
+   the server's `_id`. `status`/`appliedAt` are stamped on submit; older
+   documents may not have them yet (pages fall back gracefully). */
 export type JobApplication = {
+  _id?: string
   jobId: string
   userId: string
   userEmail: string
   jobTitle: string
   companyName: string
+  status?: ApplicationStatus
+  appliedAt?: string
+}
+
+
+export type SavedJob = {
+  _id?: string
+  jobId: string
+  userId: string
+  userEmail: string
+  jobTitle: string
+  companyName: string
+  savedAt?: string
 }

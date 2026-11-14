@@ -20,6 +20,7 @@ type JobListingsProps = {
   page: number
   pageCount: number
   sort: string
+  savedIds?: string[]
   onSortChange: (value: string) => void
   onPageChange: (page: number) => void
   onClearFilters: () => void
@@ -31,6 +32,7 @@ const JobListings = ({
   page,
   pageCount,
   sort,
+  savedIds = [],
   onSortChange,
   onPageChange,
   onClearFilters,
@@ -73,7 +75,7 @@ const JobListings = ({
       {jobs.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2">
           {jobs.map((job) => (
-            <JobCard key={job._id} job={job} />
+            <JobCard key={job._id} job={job} savedIds={savedIds} />
           ))}
         </div>
       ) : (
