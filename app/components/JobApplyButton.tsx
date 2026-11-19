@@ -1,6 +1,8 @@
 "use client"
 import { Button } from "@/components/ui/button"
+import { toast } from "@/components/ui/toast"
 import { getApplicationsCount, jobApply } from "@/lib/actions/applications"
+import { getPremiumUserById } from "@/lib/api/users"
 import { useSession } from "@/lib/auth-client"
 import { JobFormValues } from "@/type/type"
 import { useRouter } from "next/navigation"
@@ -15,11 +17,14 @@ const JobApplyButton = ({ job }: { job: JobFormValues }) => {
       router.push(`/sign-in?redirectTo=/browse-jobs/${job._id}`)
       return
     } else if (user.role === "seeker") {
+
+      const premiumResult = await getPremiumUserById(user.id)
+      console.log(premiumResult);
       // Redirect to the job application page
       // console.log("save application database");
-      const countResult = await getApplicationsCount(`userId=${user.id}`)
+      const countResult = await getApplicationsCount(`applicantId=${user.id}`)
 
-      if (countResult.count >= 10) {
+      if (!premiumResult.premium && countResult.count >= 2) {
         router.push("/checkout")
         return
       } else {
@@ -34,6 +39,10 @@ const JobApplyButton = ({ job }: { job: JobFormValues }) => {
         const result = await jobApply(application)
         if (result.insertedId) {
           console.log("Application submited", result)
+          toast.add({
+            title: "Application submitted",
+            description: "Your application has been submitted successfully.",
+          })
           router.push("/browse-jobs")
         }
       }
